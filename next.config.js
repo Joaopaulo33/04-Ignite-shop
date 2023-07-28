@@ -4,7 +4,15 @@ const nextConfig = {
   swcMinify: true,
 
   images: {
-    allowFutureImage: true,
+    domains: [
+      'files.stripe.com',
+    ],
+  },
+
+  experimental: {
+    images: {
+      allowFutureImage: true,
+    },
   },
 }
 
