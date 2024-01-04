@@ -1,14 +1,11 @@
 import Image from "next/future/image";
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetStaticProps } from "next";
+import Link from "next/link";
 
 import { useKeenSlider } from "keen-slider/react";
 
 import { stripe } from "../lib/stripe";
 import { HomeContainer, Product } from "../styles/pages/home";
-
-import camiseta1 from "../assets/camisetas/1.png";
-import camiseta2 from "../assets/camisetas/2.png";
-import camiseta3 from "../assets/camisetas/3.png";
 
 import "keen-slider/keen-slider.min.css";
 import Stripe from "stripe";
@@ -34,14 +31,20 @@ export default function Home({ products }: HomeProps) {
     <HomeContainer ref={sliderRef} className="keen-slider">
       {products.map((product) => {
         return (
-          <Product key={product.id} className="keen-slider__slide">
-            <Image src={product.imageUrl} width={520} height={480} alt="" />
+          <Link
+            href={`/product/${product.id}`}
+            key={product.id}
+            prefetch={false}
+          >
+            <Product className="keen-slider__slide">
+              <Image src={product.imageUrl} width={520} height={480} alt="" />
 
-            <footer>
-              <strong>{product.name}</strong>
-              <span>{product.price}</span>
-            </footer>
-          </Product>
+              <footer>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </footer>
+            </Product>
+          </Link>
         );
       })}
     </HomeContainer>
@@ -52,10 +55,8 @@ export const getStaticProps: GetStaticProps = async () => {
   const response = await stripe.products.list({
     expand: ["data.default_price"],
   });
-  const filteredProducts = response.data.filter((item) => {
-    return item.active;
-  });
-  const products = filteredProducts.map((product) => {
+
+  const products = response.data.map((product) => {
     const price = product.default_price as Stripe.Price;
 
     return {
